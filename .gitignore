@@ -27,3 +27,4 @@ local.properties
 .gradle
 /build/
 !gradle-wrapper.jar
+Main.java
