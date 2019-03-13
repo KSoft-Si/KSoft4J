@@ -18,11 +18,11 @@ public enum ImageTag {
     PAT, 
     HUG, 
     HENTAI_GIF, 
-    LEWD, 
+    HEADRUB, 
     NEKO;
 	
 	public boolean isNSFW(ImageTag tag) {
-		return Arrays.asList(NEKO, HENTAI_GIF, LEWD, LICK).contains(tag);
+		return Arrays.asList(NEKO, HENTAI_GIF, LICK).contains(tag);
 	}
 	public boolean isNSFW() {
 		return isNSFW(this);
