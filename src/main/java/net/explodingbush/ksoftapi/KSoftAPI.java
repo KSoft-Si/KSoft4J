@@ -2,9 +2,9 @@ package net.explodingbush.ksoftapi;
 
 import net.explodingbush.ksoftapi.entities.actions.*;
 import net.explodingbush.ksoftapi.entities.lyrics.LyricCache;
-import net.explodingbush.ksoftapi.enums.ImageTag;
 import net.explodingbush.ksoftapi.enums.ImageType;
 import net.explodingbush.ksoftapi.enums.Routes;
+import net.explodingbush.ksoftapi.image.ImageTag;
 import net.explodingbush.ksoftapi.utils.Checks;
 import net.explodingbush.ksoftapi.webhooks.WebhookManager;
 
@@ -16,6 +16,7 @@ public class KSoftAPI {
 
     public KSoftAPI(String token) {
     	Checks.notNull(token, "token");
+    	ImageTag.setToken(token);
         this.token = token;
         if(cache == null) {
         	cache = new LyricCache(token);
@@ -51,12 +52,23 @@ public class KSoftAPI {
     }
 
     /**
-     * This returns a {@link TaggedImageAction TaggedImageAction} using the declared {@link net.explodingbush.ksoftapi.enums.ImageTag ImageTags}
+     * This returns a {@link TaggedImageAction TaggedImageAction} using the declared {@link net.explodingbush.ksoftapi.image.ImageTag ImageTags}
      * @param tag
      * The {@link ImageTag ImageTag} you'd like to use
      * @return {@link TaggedImageAction TaggedImageAction}
      */
     public TaggedImageAction getTaggedImage(ImageTag tag) {
+    	Checks.notNull(tag, "tag");
+        return new TaggedImageAction(token, tag);
+    }
+    /**
+     * This returns a {@link TaggedImageAction TaggedImageAction} using the declared {@link net.explodingbush.ksoftapi.enums.ImageTag ImageTags}
+     * @param tag
+     * The {@link net.explodingbush.ksoftapi.enums.ImageTag ImageTag} you'd like to use
+     * @return {@link TaggedImageAction TaggedImageAction}
+     */
+    @SuppressWarnings("deprecation")
+	public TaggedImageAction getTaggedImage(net.explodingbush.ksoftapi.enums.ImageTag tag) {
     	Checks.notNull(tag, "tag");
         return new TaggedImageAction(token, tag);
     }
