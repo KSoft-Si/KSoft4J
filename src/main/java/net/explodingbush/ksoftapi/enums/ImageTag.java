@@ -2,6 +2,7 @@ package net.explodingbush.ksoftapi.enums;
 
 import java.util.Arrays;
 
+@Deprecated
 public enum ImageTag {
 	
     PEPE, 

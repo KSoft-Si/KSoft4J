@@ -2,10 +2,10 @@ package net.explodingbush.ksoftapi.entities.actions;
 
 import net.explodingbush.ksoftapi.KSoftActionAdapter;
 import net.explodingbush.ksoftapi.entities.TaggedImage;
-import net.explodingbush.ksoftapi.enums.ImageTag;
 import net.explodingbush.ksoftapi.enums.Routes;
 import net.explodingbush.ksoftapi.entities.impl.TaggedImageImpl;
 import net.explodingbush.ksoftapi.exceptions.LoginException;
+import net.explodingbush.ksoftapi.image.ImageTag;
 import net.explodingbush.ksoftapi.utils.Checks;
 import net.explodingbush.ksoftapi.utils.JSONBuilder;
 import org.json.JSONObject;
@@ -23,8 +23,12 @@ public class TaggedImageAction extends KSoftActionAdapter<TaggedImage> {
         this.token = token;
         this.tag = tag;
     }
+    @SuppressWarnings("deprecation")
+	public TaggedImageAction(String token, net.explodingbush.ksoftapi.enums.ImageTag tag) {
+		this(token, ImageTag.valueOf(tag.toString().toLowerCase()));
+	}
 
-    /**
+	/**
      * Declare if an image is allowed to be NSFW
      * <p>Default: <b>true (yes)</b></p>
      * @param nsfw
@@ -37,7 +41,7 @@ public class TaggedImageAction extends KSoftActionAdapter<TaggedImage> {
     }
 
     public TaggedImage execute() {
-        json = new JSONBuilder().requestKsoft(String.format(Routes.IMAGE.toString(), tag.name().toLowerCase(), String.valueOf(allowNsfw)), token);
+        json = new JSONBuilder().requestKsoft(String.format(Routes.IMAGE.toString(), tag.toString(), String.valueOf(allowNsfw)), token);
         if (token.isEmpty() || !json.isNull("detail") && json.getString("detail").equalsIgnoreCase("Invalid token.")) {
             throw new LoginException();
         }

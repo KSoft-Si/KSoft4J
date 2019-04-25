@@ -1,6 +1,6 @@
 package net.explodingbush.ksoftapi.entities;
 
-import net.explodingbush.ksoftapi.enums.ImageTag;
+import net.explodingbush.ksoftapi.image.ImageTag;
 import net.explodingbush.ksoftapi.enums.Routes;
 import net.explodingbush.ksoftapi.KSoftActionAdapter;
 import net.explodingbush.ksoftapi.entities.impl.TaggedImageImpl;
@@ -21,6 +21,10 @@ public class TaggedImageAction extends KSoftActionAdapter<TaggedImage> {
     	Checks.notNull(tag, "tag");
         this.token = token;
         this.tag = tag;
+    }
+    @SuppressWarnings("deprecation")
+	public TaggedImageAction(String token, net.explodingbush.ksoftapi.enums.ImageTag tag) {
+    	this(token, ImageTag.valueOf(tag.name()));
     }
 
     /**
@@ -43,7 +47,7 @@ public class TaggedImageAction extends KSoftActionAdapter<TaggedImage> {
      * If the token is not provided or incorrect.
      */
     public TaggedImage execute() {
-        json = new JSONBuilder().requestKsoft(String.format(Routes.IMAGE.toString(), tag.name().toLowerCase(), String.valueOf(allowNsfw)), token);
+        json = new JSONBuilder().requestKsoft(String.format(Routes.IMAGE.toString(), tag.toString(), String.valueOf(allowNsfw)), token);
         if (token.isEmpty() || !json.isNull("detail") && json.getString("detail").equalsIgnoreCase("Invalid token.")) {
             throw new LoginException();
         }

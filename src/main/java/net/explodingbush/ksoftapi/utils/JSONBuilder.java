@@ -1,6 +1,7 @@
 package net.explodingbush.ksoftapi.utils;
 
 import net.explodingbush.ksoftapi.enums.Routes;
+import net.explodingbush.ksoftapi.exceptions.APIException;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -14,7 +15,7 @@ import java.net.URL;
 public class JSONBuilder {
 
     private OkHttpClient client = new OkHttpClient();
-    private final String userAgent = "KSoft4J/1.0";
+    private final String userAgent = "KSoft4J/1.1";
 
 
     public JSONObject request(String url) {
@@ -23,27 +24,24 @@ public class JSONBuilder {
             String source = client.newCall(new Request.Builder().url(url).addHeader("User-Agent", userAgent).build()).execute().body().string();
             return new JSONObject(source);
         } catch (IOException e) {
-            e.printStackTrace();
+        	throw new APIException(e);
         }
-        return null;
     }
     public String requestRaw(String url) {
     	Checks.notNull(url, "url");
         try {
             return client.newCall(new Request.Builder().url(url).addHeader("User-Agent", userAgent).build()).execute().body().string();
         } catch (IOException e) {
-            e.printStackTrace();
+        	throw new APIException(e);
         }
-        return null;
     }
     public JSONObject getJSONResponse(Response response) {
     	Checks.notNull(response, "response");
         try {
             return new JSONObject(response.body().string());
         } catch (IOException e) {
-            e.printStackTrace();
+        	throw new APIException(e);
         }
-        return null;
     }
     public JSONObject requestKsoft(String url, String token) {
     	Checks.notNull(url, "url");
@@ -53,9 +51,8 @@ public class JSONBuilder {
                     .url(url).addHeader("User-Agent", userAgent).build()).execute().body().string();
             return new JSONObject(source);
         } catch (IOException e) {
-            e.printStackTrace();
+        	throw new APIException(e);
         }
-        return null;
     }
     public JSONObject bulkBanCheck(JSONObject json, String token, Routes route) {
         Checks.notNull(json, "IDs");
@@ -71,9 +68,8 @@ public class JSONBuilder {
             }
             return bulk;
         } catch (IOException e) {
-            e.printStackTrace();
+        	throw new APIException(e);
         }
-        return null;
     }
     public JSONObject addBanKsoft(JSONObject json, Routes route, String token) {
     	Checks.notNull(json, "json");
@@ -112,9 +108,8 @@ public class JSONBuilder {
                     .url(url).addHeader("User-Agent", userAgent).post(body.build()).build()).execute().body().string();
             return new JSONObject(source);
         } catch (IOException e) {
-            e.printStackTrace();
+        	throw new APIException(e);
         }
-        return null;
     }
     public Response recommendSongRequest(Routes route, JSONObject json, String token) {
         Checks.notNull(route, "route");
@@ -124,9 +119,8 @@ public class JSONBuilder {
            return client.newCall(new Request.Builder().addHeader("Content-Type", "application/json").post(RequestBody.create(MediaType.parse("application/json"), json.toString().getBytes())).addHeader("User-Agent", userAgent).addHeader("Authorization", "Bearer " + token)
                     .url(route.toString()).build()).execute();
         } catch (IOException e) {
-            e.printStackTrace();
+        	throw new APIException(e);
         }
-        return null;
     }
     public Response requestKsoftResponse(String url, String token) {
     	Checks.notNull(url, "url");
@@ -135,9 +129,8 @@ public class JSONBuilder {
             return client.newCall(new Request.Builder().addHeader("User-Agent", userAgent).addHeader("Authorization", "Bearer " + token)
                     .url(url).build()).execute();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new APIException(e);
         }
-        return null;
     }
     public File getImage(String title, String url) {
     	Checks.notNull(url, "url");
