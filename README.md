@@ -94,8 +94,8 @@ public class Main {
 Notice how `.set();` and `ban.execute();` are separate? Being able to make this function work means the `.set()` creates a new instance of `Ban` that allows for reporting a ban. Since the code above uses an already instantiated version of `Ban`, KSoft4J still thinks you're trying to grab stuff, not report.
 
 ## Download
-Latest Stable Version: [Bintray Release](https://bintray.com/mattmalec/KSoft4J/KSoft4J/1.0.6/link) <br>
-Latest Version: [ ![Download](https://api.bintray.com/packages/mattmalec/KSoft4J/KSoft4J/images/download.svg?version=1.0.6) ](https://bintray.com/mattmalec/KSoft4J/KSoft4J/1.0.6/link)
+Latest Stable Version: [Bintray Release](https://bintray.com/mattmalec/KSoft4J/KSoft4J/1.0.8/link) <br>
+Latest Version: [ ![Download](https://api.bintray.com/packages/mattmalec/KSoft4J/KSoft4J/images/download.svg?version=1.0.8) ](https://bintray.com/mattmalec/KSoft4J/KSoft4J/1.0.8/link)
 
 Be sure to replace the **VERSION** key below with the one of the versions shown above!
 
@@ -151,7 +151,7 @@ This project requires **Java 8**.<br>
 All dependencies are managed automatically by Gradle.
 
  * slf4j-api
-   * Version: **1.6.1**
+   * Version: **1.7.25**
    * [Website](https://www.slf4j.org/)
    * [JCenter Repository](https://bintray.com/bintray/jcenter/org.slf4j%3Aslf4j-api/view)
  * OkHttp
