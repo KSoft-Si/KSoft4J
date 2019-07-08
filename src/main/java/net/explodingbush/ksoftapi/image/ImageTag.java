@@ -1,20 +1,19 @@
 package net.explodingbush.ksoftapi.image;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.explodingbush.ksoftapi.KSoftAction;
 import net.explodingbush.ksoftapi.KSoftActionAdapter;
 import net.explodingbush.ksoftapi.enums.Routes;
 import net.explodingbush.ksoftapi.utils.Checks;
 import net.explodingbush.ksoftapi.utils.JSONBuilder;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ImageTag {
 
@@ -42,9 +41,10 @@ public class ImageTag {
 		return tag;
 	}
 	/**
-	 * Returns the ImageTag associated with the given name
+	 * Returns the ImageTag associated with the given name from the cache
 	 * 
 	 * @param name
+	 * The name of the ImageTag to be searched for
 	 * @return the corresponding ImageTag
 	 * 
 	 * @throws IllegalArgumentException
