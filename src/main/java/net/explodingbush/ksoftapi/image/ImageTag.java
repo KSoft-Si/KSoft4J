@@ -1,22 +1,25 @@
 package net.explodingbush.ksoftapi.image;
 
-import net.explodingbush.ksoftapi.KSoftAction;
-import net.explodingbush.ksoftapi.KSoftActionAdapter;
-import net.explodingbush.ksoftapi.enums.Routes;
-import net.explodingbush.ksoftapi.utils.Checks;
-import net.explodingbush.ksoftapi.utils.JSONBuilder;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import net.explodingbush.ksoftapi.KSoftAction;
+import net.explodingbush.ksoftapi.KSoftActionAdapter;
+import net.explodingbush.ksoftapi.enums.Routes;
+import net.explodingbush.ksoftapi.utils.Checks;
+import net.explodingbush.ksoftapi.utils.JSONBuilder;
+
 public class ImageTag {
 
+	private static final Object mutex = new Object();
+	
 	private static final Logger LOG = LoggerFactory.getLogger(ImageTag.class);
 	private static Map<String, ImageTag> cache;
 	private static String token;
@@ -41,10 +44,9 @@ public class ImageTag {
 		return tag;
 	}
 	/**
-	 * Returns the ImageTag associated with the given name from the cache
+	 * Returns the ImageTag associated with the given name
 	 * 
 	 * @param name
-	 * The name of the ImageTag to be searched for
 	 * @return the corresponding ImageTag
 	 * 
 	 * @throws IllegalArgumentException
@@ -56,7 +58,7 @@ public class ImageTag {
 		Checks.notNull(name, "tag name");
 		try {
 			name = name.toLowerCase();
-			synchronized(cache) {
+			synchronized(mutex) {
 				if(cache == null) {
 					refreshCache().execute();
 				}
@@ -76,22 +78,24 @@ public class ImageTag {
 	 * 
 	 * @return a {@link KSoftAction KSoftAction}
 	 */
-	public static synchronized KSoftAction<Void> refreshCache() {
+	public static KSoftAction<Void> refreshCache() {
 		return new KSoftActionAdapter<Void>() {
 			@Override
 			public Void execute() {
-				JSONObject j = new JSONBuilder().requestKsoft(Routes.IMAGE_TAGS.toString(), token);
-				JSONArray models = j.getJSONArray("models");
-				cache = new HashMap<>();
-				models.forEach(obj -> {
-					JSONObject json = (JSONObject)obj;
-					cache.put(json.getString("name"), new ImageTag(json.getString("name"), json.getBoolean("nsfw")));
-				});
-				JSONArray nsfwTags = j.getJSONArray("nsfw_tags");
-				nsfwTags.forEach(obj -> {
-					cache.put(obj.toString(), new ImageTag(obj.toString(), true));
-				});
-				return null;
+				synchronized(mutex) {
+					JSONObject j = new JSONBuilder().requestKsoft(Routes.IMAGE_TAGS.toString(), token);
+					JSONArray models = j.getJSONArray("models");
+					cache = new HashMap<>();
+					models.forEach(obj -> {
+						JSONObject json = (JSONObject)obj;
+						cache.put(json.getString("name"), new ImageTag(json.getString("name"), json.getBoolean("nsfw")));
+					});
+					JSONArray nsfwTags = j.getJSONArray("nsfw_tags");
+					nsfwTags.forEach(obj -> {
+						cache.put(obj.toString(), new ImageTag(obj.toString(), true));
+					});
+					return null;
+				}
 			}
 			
 		};

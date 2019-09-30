@@ -1,12 +1,12 @@
 package net.explodingbush.ksoftapi;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class KSoftActionAdapter<T> implements KSoftAction<T> {
 

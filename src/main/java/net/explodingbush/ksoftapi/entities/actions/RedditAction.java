@@ -4,8 +4,10 @@ import net.explodingbush.ksoftapi.KSoftActionAdapter;
 import net.explodingbush.ksoftapi.entities.Reddit;
 import net.explodingbush.ksoftapi.entities.impl.RedditImpl;
 import net.explodingbush.ksoftapi.enums.ImageType;
+import net.explodingbush.ksoftapi.exceptions.APIException;
 import net.explodingbush.ksoftapi.exceptions.LoginException;
 import net.explodingbush.ksoftapi.exceptions.MissingArgumentException;
+import net.explodingbush.ksoftapi.exceptions.NotFoundException;
 import net.explodingbush.ksoftapi.utils.Checks;
 import net.explodingbush.ksoftapi.utils.JSONBuilder;
 import net.explodingbush.ksoftapi.webhooks.WebhookService;
@@ -19,6 +21,7 @@ public class RedditAction extends KSoftActionAdapter<Reddit> {
     private ImageType type;
     private String subreddit;
     private String request;
+    private boolean allowNSFW;
     private Logger logger = new WebhookService(null).getLogger();
 
     public RedditAction(String token, ImageType type, String request) {
@@ -38,10 +41,28 @@ public class RedditAction extends KSoftActionAdapter<Reddit> {
      */
     public RedditAction setSubreddit(String subreddit) {
     	Checks.notNull(subreddit, "subreddit");
+    	while(subreddit.endsWith("/")) {
+    		subreddit = subreddit.substring(0, subreddit.length()-1);
+    	}
+    	Checks.notBlank(subreddit, "subreddit");
+    	if(subreddit.contains("/")) {
+    		subreddit = subreddit.substring(subreddit.lastIndexOf("/")+1);
+    	}
         this.subreddit = subreddit;
         return this;
     }
-
+    
+    /**
+     * Sets whether to allow NSFW posts. Default is false.
+     * @param nsfw
+     *  Whether to allow an NSFW to be returned.
+     * @return RedditAction instance. Useful for chaining.
+     */
+    public RedditAction allowNSFW(boolean nsfw) {
+    	this.allowNSFW = nsfw;
+    	return this;
+    }
+    
     /**
      * Executes the request with the specified parameters
      *
@@ -60,10 +81,19 @@ public class RedditAction extends KSoftActionAdapter<Reddit> {
             logger.warn("You're setting a subreddit, but ImageType is not RANDOM_REDDIT");
         }
         if (type.equals(ImageType.RANDOM_REDDIT)) {
-            request = request.concat("/" + subreddit);
+            request += "/" + subreddit;
         }
+        request += "?remove_nsfw=" + !allowNSFW;
         response = new JSONBuilder().requestKsoftResponse(request, token);
         json = new JSONBuilder().getJSONResponse(response);
+        if(json.has("error")) {
+        	System.err.println(request + " -> " + json);
+        	RuntimeException e = new NotFoundException("Error " + json.get("error") + ": " + json.getString("message"));
+        	if((json.get("error") instanceof Integer) && json.getInt("error") == 404) {
+        		throw e;
+        	}
+        	throw new APIException(e);
+        }
         if (token.isEmpty() || !json.isNull("detail") && json.getString("detail").equalsIgnoreCase("Invalid token.")) {
             throw new LoginException();
         }
