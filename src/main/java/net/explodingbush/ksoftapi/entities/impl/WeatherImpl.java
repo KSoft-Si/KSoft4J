@@ -36,7 +36,7 @@ public class WeatherImpl implements Weather {
 	@Override
 	public Units getUnits() {
 		try {
-			return Units.valueOf(json.getString("units"));
+			return Units.valueOf(json.getString("units").toUpperCase());
 		}
 		catch(Exception e) {
 			return Units.AUTO;
