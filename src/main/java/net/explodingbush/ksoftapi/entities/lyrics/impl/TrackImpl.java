@@ -100,6 +100,10 @@ public class TrackImpl implements Track {
 		return Integer.parseInt(json.getString("id"));
 	}
 	
+	@Override
+	public String getAlbumArt() {
+		return json.optString("album_art", null);
+	}
 	public String toString() {
 		return String.format("%s: %s (ID: %s)", this.getClass().getSimpleName(), this.getName(), this.getId());
 	}

@@ -9,11 +9,11 @@ import net.explodingbush.ksoftapi.enums.Routes;
 import net.explodingbush.ksoftapi.exceptions.LoginException;
 import net.explodingbush.ksoftapi.utils.Checks;
 import net.explodingbush.ksoftapi.utils.JSONBuilder;
+
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 public class LyricAction extends KSoftActionAdapter<List<Track>> {
@@ -82,25 +82,18 @@ public class LyricAction extends KSoftActionAdapter<List<Track>> {
 	 * @return A possibly-empty list of {@link Lyric Lyrics}
 	 * @throws LoginException If the token is not provided or incorrect.
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<Track> execute() {
 		JSONObject json;
 		json = new JSONBuilder().requestKsoft(String.format(Routes.LYRICS_SEARCH.toString(), query, Boolean.toString(textOnly), limit), token);
         if (json.getInt("total") == 0) {
-        	return Collections.unmodifiableList(new ArrayList<>());
+        	return Collections.emptyList();
         }
         if (token.isEmpty() || !json.isNull("detail") && json.getString("detail").equalsIgnoreCase("Invalid token.")) {
             throw new LoginException();
         }
         List<Track> lyrics = new ArrayList<>();
-        List<Object> lyricObjs = json.getJSONArray("data").toList();
-        if(lyricObjs.isEmpty()){
-			return Collections.unmodifiableList(new ArrayList<>());
-        }
-        for(Object obj : lyricObjs){
-        	lyrics.add(new TrackImpl(new JSONObject((HashMap<String, Object>)obj), cache));
-        }
+        json.getJSONArray("data").forEach(obj -> lyrics.add(new TrackImpl((JSONObject)obj, cache)));
 		return Collections.unmodifiableList(lyrics);
 	}
 }

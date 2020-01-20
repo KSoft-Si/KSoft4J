@@ -4,7 +4,6 @@ import net.explodingbush.ksoftapi.KSoftActionAdapter;
 import net.explodingbush.ksoftapi.entities.Reddit;
 import net.explodingbush.ksoftapi.entities.impl.RedditImpl;
 import net.explodingbush.ksoftapi.enums.ImageType;
-import net.explodingbush.ksoftapi.exceptions.APIException;
 import net.explodingbush.ksoftapi.exceptions.LoginException;
 import net.explodingbush.ksoftapi.exceptions.MissingArgumentException;
 import net.explodingbush.ksoftapi.exceptions.NotFoundException;
@@ -86,13 +85,8 @@ public class RedditAction extends KSoftActionAdapter<Reddit> {
         request += "?remove_nsfw=" + !allowNSFW;
         response = new JSONBuilder().requestKsoftResponse(request, token);
         json = new JSONBuilder().getJSONResponse(response);
-        if(json.has("error")) {
-        	System.err.println(request + " -> " + json);
-        	RuntimeException e = new NotFoundException("Error " + json.get("error") + ": " + json.getString("message"));
-        	if((json.get("error") instanceof Integer) && json.getInt("error") == 404) {
-        		throw e;
-        	}
-        	throw new APIException(e);
+        if(json.has("error") && json.getBoolean("error")) {
+        	new NotFoundException(json.getString("message"));
         }
         if (token.isEmpty() || !json.isNull("detail") && json.getString("detail").equalsIgnoreCase("Invalid token.")) {
             throw new LoginException();
