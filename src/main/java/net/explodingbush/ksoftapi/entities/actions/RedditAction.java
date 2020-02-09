@@ -4,6 +4,7 @@ import net.explodingbush.ksoftapi.KSoftActionAdapter;
 import net.explodingbush.ksoftapi.entities.Reddit;
 import net.explodingbush.ksoftapi.entities.impl.RedditImpl;
 import net.explodingbush.ksoftapi.enums.ImageType;
+import net.explodingbush.ksoftapi.enums.Span;
 import net.explodingbush.ksoftapi.exceptions.LoginException;
 import net.explodingbush.ksoftapi.exceptions.MissingArgumentException;
 import net.explodingbush.ksoftapi.exceptions.NotFoundException;
@@ -18,6 +19,7 @@ public class RedditAction extends KSoftActionAdapter<Reddit> {
 
     private String token;
     private ImageType type;
+    private Span span;
     private String subreddit;
     private String request;
     private boolean allowNSFW;
@@ -30,6 +32,7 @@ public class RedditAction extends KSoftActionAdapter<Reddit> {
         this.token = token;
         this.type = type;
         this.request = request;
+        this.span = Span.DAY;
     }
 
     /**
@@ -54,11 +57,23 @@ public class RedditAction extends KSoftActionAdapter<Reddit> {
     /**
      * Sets whether to allow NSFW posts. Default is false.
      * @param nsfw
-     *  Whether to allow an NSFW to be returned.
+     *  Whether to allow an NSFW post to be returned.
      * @return RedditAction instance. Useful for chaining.
      */
     public RedditAction allowNSFW(boolean nsfw) {
     	this.allowNSFW = nsfw;
+    	return this;
+    }
+    
+    /**
+     * Sets the time span. Default is {@link Span#DAY}.
+     * @param spam
+     *  Time span to search for images in.
+     * @return RedditAction instance. Useful for chaining.
+     */
+    public RedditAction setSpan(Span span) {
+    	Checks.notNull(span, "span");
+    	this.span = span;
     	return this;
     }
     
@@ -83,10 +98,11 @@ public class RedditAction extends KSoftActionAdapter<Reddit> {
             request += "/" + subreddit;
         }
         request += "?remove_nsfw=" + !allowNSFW;
+        request += "&span=" + span.toString().toLowerCase();
         response = new JSONBuilder().requestKsoftResponse(request, token);
         json = new JSONBuilder().getJSONResponse(response);
         if(json.has("error") && json.getBoolean("error")) {
-        	new NotFoundException(json.getString("message"));
+        	throw new NotFoundException(json.getString("message"));
         }
         if (token.isEmpty() || !json.isNull("detail") && json.getString("detail").equalsIgnoreCase("Invalid token.")) {
             throw new LoginException();
