@@ -8,6 +8,9 @@ public class APIException extends RuntimeException {
 		super(e.getMessage());
 		this.e = e;
 	}
+	public Throwable getCause() {
+		return e;
+	}
 	public String toString() {
 		return this.getClass().getName() + ": Ran into an exception when fetching data from the API!\n"+e;
 	}
