@@ -12,6 +12,7 @@ import net.explodingbush.ksoftapi.utils.Checks;
 import net.explodingbush.ksoftapi.utils.JSONBuilder;
 import net.explodingbush.ksoftapi.webhooks.WebhookService;
 import okhttp3.Response;
+
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
@@ -107,7 +108,6 @@ public class RedditAction extends KSoftActionAdapter<Reddit> {
         if (token.isEmpty() || !json.isNull("detail") && json.getString("detail").equalsIgnoreCase("Invalid token.")) {
             throw new LoginException();
         }
-        json = new JSONBuilder().requestKsoft(request, token);
         return new RedditImpl(json);
     }
 }

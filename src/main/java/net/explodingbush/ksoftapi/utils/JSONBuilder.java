@@ -6,6 +6,8 @@ import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import org.json.JSONException;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -39,7 +41,7 @@ public class JSONBuilder {
     	Checks.notNull(response, "response");
         try {
             return new JSONObject(response.body().string());
-        } catch (IOException e) {
+        } catch (IOException | JSONException e) {
         	throw new APIException(e);
         }
     }
@@ -47,9 +49,9 @@ public class JSONBuilder {
     	Checks.notNull(url, "url");
     	Checks.notNull(token, "token");
         try {
-            String source = client.newCall(new Request.Builder().addHeader("Authorization", "Bearer " + token)
-                    .url(url).addHeader("User-Agent", userAgent).build()).execute().body().string();
-            return new JSONObject(source);
+            Response response = client.newCall(new Request.Builder().addHeader("Authorization", "Bearer " + token)
+                    .url(url).addHeader("User-Agent", userAgent).build()).execute();
+            return getJSONResponse(response);
         } catch (IOException e) {
         	throw new APIException(e);
         }
