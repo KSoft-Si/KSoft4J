@@ -1,6 +1,8 @@
 # KSoft4J
 Java wrapper for the KSoft API
 
+> :warning: This wrapper is terribly outdated and is written like shit. I **would not** expect it to work as intended.
+
 ## Creating the KSoftAPI Object
 
 You can create the KSoftAPI object by creating a new instance of `KSoftAPI` and passing the token.
